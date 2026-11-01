@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NYMEX WTI Crude Oil Forward Curve Monitor</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #F7F8FA;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #222222;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+    }
+    .main-container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 10px 6px 28px 6px;
+    }
+    .app-header {
+      background: linear-gradient(135deg, #1B2432 0%, #2C3E50 100%);
+      color: #FFFFFF;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      text-align: center;
+    }
+    .app-header h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 19px;
+      line-height: 1.35;
+      white-space: pre-line;
+    }
+    .chart-card, .section-card {
+      background: #FFFFFF;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      border: 1px solid #E6E9ED;
+    }
+    .plot-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .plot-inner {
+      min-width: 480px;
+      width: 100%;
+    }
+    canvas.chart-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .curve-explainer {
+      margin: 6px 0 2px 0;
+      font-size: 12.5px;
+      color: #444444;
+      font-style: italic;
+      text-align: center;
+      line-height: 1.4;
+    }
+    details > summary {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1B2432;
+      cursor: pointer;
+      padding: 4px 2px;
+      outline: none;
+      user-select: none;
+    }
+    details[open] > summary {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #EEF0F2;
+      padding-bottom: 8px;
+    }
+    .section-desc {
+      font-size: 12px;
+      color: #555555;
+      margin: 0 0 8px 0;
+      line-height: 1.45;
+    }
+    .table-scroll-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      font-size: 12px;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #DEE2E6;
+      font-size: 12px;
+      background-color: #FFFFFF;
+    }
+    table.data-table th,
+    table.data-table td {
+      border: 1px solid #DEE2E6;
+      padding: 6px 8px;
+      white-space: nowrap;
+    }
+    table.data-table thead th {
+      background-color: #F8F9FA;
+      color: #1B2432;
+      font-weight: 600;
+      border-bottom-width: 2px;
+    }
+    table.data-table tbody tr:nth-of-type(odd) {
+      background-color: #F9FAFB;
+    }
+    table.data-table tbody tr:hover {
+      background-color: #F1F3F5;
+    }
+    table.data-table.align-right th,
+    table.data-table.align-right td {
+      text-align: right;
+    }
+    .ref-date-group {
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .ref-date-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #333333;
+    }
+    .ref-date-input {
+      padding: 5px 10px;
+      font-size: 13px;
+      border: 1px solid #CCCCCC;
+      border-radius: 4px;
+      background-color: #F8F9FA;
+      color: #333333;
+      width: 220px;
+      max-width: 100%;
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 640px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .app-header h2 {
+        font-size: 17px;
+      }
+      .chart-card, .section-card {
+        padding: 10px 10px;
+      }
+    }
+    .control-group {
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+    .control-label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: #333333;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .select-input {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 13px;
+      border: 1px solid #CCCCCC;
+      border-radius: 4px;
+      background-color: #FFFFFF;
+      color: #333333;
+    }
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slider-wrap input[type="range"] {
+      flex: 1;
+      accent-color: #428BCA;
+      cursor: pointer;
+    }
+    .slider-val-badge {
+      display: inline-block;
+      min-width: 38px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFFFFF;
+      background-color: #428BCA;
+      border-radius: 3px;
+      padding: 2px 6px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-danger {
+      color: #FFFFFF;
+      background-color: #D9534F;
+      border: 1px solid #D43F3A;
+      margin-bottom: 10px;
+    }
+    .btn-danger:hover {
+      background-color: #C9302C;
+      border-color: #AC2925;
+    }
+    .btn-default {
+      color: #333333;
+      background-color: #FFFFFF;
+      border: 1px solid #CCCCCC;
+      font-weight: 500;
+    }
+    .btn-default:hover {
+      background-color: #E6E6E6;
+      border-color: #ADADAD;
+    }
+    .status-note {
+      font-size: 12px;
+      color: #555555;
+      margin-top: 12px;
+      padding: 8px 10px;
+      background: #F8F9FA;
+      border-radius: 4px;
+      border: 1px solid #E9ECEF;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- 1. Centered Two-Line Header -->
+    <div class="app-header">
+      <h2>NYMEX WTI Crude Oil Futures (CL)
+Forward Curve &amp; Volume Monitor</h2>
+    </div>
+
+    <!-- 2. Top Diagram: Forward Curve (First thing the user sees) -->
+    <div class="chart-card">
+      <div class="plot-scroll-wrap">
+        <div class="plot-inner">
+          <canvas id="forward_curve_plot" class="chart-canvas" height="370"></canvas>
+        </div>
+      </div>
+      <p class="curve-explainer">
+        Front-month curve shown in red (end-of-day price), prior 6 weeks shown (end-of-week price) in progressively less intense color.
+      </p>
+    </div>
+
+    <!-- 3. Optional Collapsible Daily Volumes Chart -->
+    <div class="section-card">
+      <details id="vol_details">
+        <summary>View daily traded volume</summary>
+        <div class="plot-scroll-wrap">
+          <div class="plot-inner">
+            <canvas id="volume_plot" class="chart-canvas" height="320"></canvas>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- 4(a). Collapsible Div: Settlement Prices -->
+    <div class="section-card">
+      <details>
+        <summary>Settlement Prices</summary>
+        <p class="section-desc">
+          End-of-day and prior 6 end-of-week settlement prices (USD / bbl) across the 12 forward tenors (0 to 60 months out).
+        </p>
+        <div class="table-scroll-wrap" id="prices_table_container"></div>
+      </details>
+    </div>
+
+    <!-- 4(b). Collapsible Div: Daily & Weekly Volumes Table -->
+    <div class="section-card">
+      <details>
+        <summary>Daily &amp; Weekly Volumes Table</summary>
+        <p class="section-desc">
+          Latest end-of-day daily volume and summed weekly volumes (Mon-Fri) across the 12 forward tenors.
+        </p>
+        <div class="table-scroll-wrap" id="volumes_table_container"></div>
+      </details>
+    </div>
+
+    <!-- 4(c). Collapsible Div: Contract Schedule & Roll Logic -->
+    <div class="section-card">
+      <details>
+        <summary>Contract Schedule &amp; Roll Logic</summary>
+        <p class="section-desc">
+          Calculated dynamically from the reference date per CME Rulebook Chapter 200: WTI futures expire 3 business days prior to the 25th calendar day of the month preceding the delivery month (or 4 business days prior if the 25th is a weekend/holiday).
+        </p>
+        <div class="ref-date-group">
+          <label for="schedule_ref_date">Reference Date for Contract Roll:</label>
+          <input type="date" id="schedule_ref_date" class="ref-date-input" readonly>
+        </div>
+        <div class="table-scroll-wrap" id="schedule_table_container"></div>
+      </details>
+    </div>
+
+    <!-- 5. Very Bottom: Chart Controls & Export Options -->
+    <div class="section-card">
+      <h4 style="margin-top:0; margin-bottom:12px; font-size:15px; font-weight:600; color:#1B2432;">
+        Chart Controls &amp; Export Options
+      </h4>
+      <div class="controls-grid">
+        <!-- Left Column -->
+        <div>
+          <div class="control-group">
+            <span class="control-label">Forward Curve X-Axis Spacing:</span>
+            <label class="radio-option">
+              <input type="radio" name="x_spacing" value="proportional" checked>
+              <span>Proportional (0 to 60 Months)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="x_spacing" value="even">
+              <span>Equal Tenor Spacing</span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="color_preset">Curve Color Scheme:</label>
+            <select id="color_preset" class="select-input">
+              <option value="Red — rgb(1, 0, 0, alpha)">Red — rgb(1, 0, 0, alpha)</option>
+              <option value="Navy — rgb(0, 0.2, 0.8, alpha)">Navy — rgb(0, 0.2, 0.8, alpha)</option>
+              <option value="Teal — rgb(0, 0.5, 0.4, alpha)">Teal — rgb(0, 0.5, 0.4, alpha)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="min_alpha">6-Weeks-Ago Minimum Alpha:</label>
+            <div class="slider-wrap">
+              <input type="range" id="min_alpha" min="0.05" max="0.35" step="0.05" value="0.10">
+              <span id="min_alpha_val" class="slider-val-badge">0.10</span>
+            </div>
+          </div>
+
+          <div class="control-group" style="display: none;">
+            <span class="control-label">Volume Chart Scale:</span>
+            <label class="radio-option">
+              <input type="radio" name="vol_scale" value="linear" checked>
+              <span>Linear ('000 Contracts)</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="vol_scale" value="log10">
+              <span>Log10 Scale (Contracts)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+          <button type="button" id="reload_btn" class="btn btn-danger">
+            &#x21bb; Reload data
+          </button>
+          <hr style="display: none; margin: 10px 0; border: 0; border-top: 1px solid #E6E9ED;">
+          <button type="button" id="dl_prices" class="btn btn-default" style="display: none; margin-bottom: 8px;">
+            &#x2B07; Download Prices CSV
+          </button>
+          <button type="button" id="dl_volumes" class="btn btn-default" style="display: none;">
+            &#x2B07; Download Volumes CSV
+          </button>
+        </div>
+      </div>
+
+      <div id="status_banner_ui" class="status-note">
+        Loading NYMEX WTI dataset...
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

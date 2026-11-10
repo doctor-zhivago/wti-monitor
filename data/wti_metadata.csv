@@ -1,14 +1,14 @@
 key,value
-latest_trade_date,2026-11-09
-schedule_ref_date,2026-11-09
+latest_trade_date,2026-11-10
+schedule_ref_date,2026-11-10
 front_month_summary,"CLZ26 (Dec 2026, expires 2026-11-20)"
-last_updated,2026-11-09 23:10:06
-status_msg,Loaded NYMEX WTI dataset (Latest EOD: 2026-11-09 | Last Updated: 2026-11-09 23:10:06).
+last_updated,2026-11-10 23:05:52
+status_msg,Loaded NYMEX WTI dataset (Latest EOD: 2026-11-10 | Last Updated: 2026-11-10 23:05:52).
 curve_chart_title,NYMEX WTI Crude Oil (CL) Forward Curve
 curve_y_label,Settlement Price (USD)
 curve_x_label,Forward Tenor
 vol_chart_title_1,Volume
-vol_chart_title_2,End-of-day data per 2026-11-09
+vol_chart_title_2,End-of-day data per 2026-11-10
 vol_y_label_linear_1,Volume
 vol_y_label_linear_2,'000 Contracts
 vol_y_label_log10_1,Volume
@@ -16,10 +16,10 @@ vol_y_label_log10_2,log10(Contracts)
 n_curves,7
 price_y_ticks,60|70|80|90|100
 price_y_ticks_py,278.26|229.82|181.37|132.93|84.49
-vol_lin_y_ticks,0|10|20|30|40|50|60|70
-vol_lin_y_ticks_py,232.00|208.74|185.48|162.22|138.96|115.70|92.44|69.19
-vol_log_y_ticks,0|1|2|3|4|5
-vol_log_y_ticks_py,232.00|198.79|165.58|132.37|99.16|65.95
+vol_lin_y_ticks,0|50|100|150|200|250
+vol_lin_y_ticks_py,232.00|201.49|170.99|140.48|109.97|79.46
+vol_log_y_ticks,0|1|2|3|4|5|6
+vol_log_y_ticks_py,232.00|202.35|172.70|143.05|113.41|83.76|54.11
 alphas_0.05,1.0000|0.7243|0.5259|0.3743|0.2512|0.1454|0.0500
 alphas_0.10,1.0000|0.7656|0.5821|0.4331|0.3077|0.1984|0.1000
 alphas_0.15,1.0000|0.7936|0.6240|0.4811|0.3578|0.2487|0.1500

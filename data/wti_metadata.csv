@@ -2,8 +2,8 @@ key,value
 latest_trade_date,2026-11-13
 schedule_ref_date,2026-11-13
 front_month_summary,"CLZ26 (Dec 2026, expires 2026-11-20)"
-last_updated,2026-11-14 22:59:35
-status_msg,Loaded NYMEX WTI dataset (Latest EOD: 2026-11-13 | Last Updated: 2026-11-14 22:59:35).
+last_updated,2026-11-15 23:00:36
+status_msg,Loaded NYMEX WTI dataset (Latest EOD: 2026-11-13 | Last Updated: 2026-11-15 23:00:36).
 curve_chart_title,NYMEX WTI Crude Oil (CL) Forward Curve
 curve_y_label,Settlement Price (USD)
 curve_x_label,Forward Tenor
